@@ -262,11 +262,34 @@ def download_cloudflared() -> str:
 def start_argo_tunnel(cf_bin: str, argo_port: int, argo_domain: str, argo_auth: str) -> str:
     if argo_domain and argo_auth:
         log.info("启动固定 Argo 隧道...")
-        subprocess.Popen(
+        cf_log_file = HOME / "cloudflared.log"
+        log_fd = open(cf_log_file, "a")
+        proc = subprocess.Popen(
             [cf_bin, "tunnel", "--edge-ip-version", "auto", "--no-autoupdate", "run", "--token", argo_auth],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            stdout=log_fd, stderr=log_fd,
         )
-        time.sleep(3)
+
+        # cloudflared 因 token 无效/域名未绑定等原因失败时，通常几秒内就会退出。
+        # 这里等待期间轮询进程状态，提前退出就如实报错，而不是无脑当作成功。
+        check_interval = 0.5
+        waited = 0.0
+        while waited < 3.0:
+            if proc.poll() is not None:
+                log_fd.close()
+                log.error("================ 固定 Argo 隧道启动失败 ================")
+                log.error("cloudflared 进程已退出（退出码 %s），详细日志见 %s", proc.returncode, cf_log_file)
+                try:
+                    tail = cf_log_file.read_text()[-2000:]
+                    log.error(tail.strip())
+                except OSError:
+                    pass
+                log.error("==========================================================")
+                log.error("常见原因：ARGO_AUTH token 无效/过期，或 ARGO_DOMAIN 未在 Cloudflare 面板绑定成功")
+                return ""
+            time.sleep(check_interval)
+            waited += check_interval
+
+        log.info("固定 Argo 隧道进程存活，日志见 %s", cf_log_file)
         return argo_domain
 
     log.info("启动临时 Argo 隧道...")
@@ -581,8 +604,15 @@ def main():
     if not sb_bin:
         sb_bin = download_singbox()
 
-    # ── 端口唯一性检测 ──
+    # ── 端口唯一性检测：预先占位已被脚本自身占用的端口，
+    #    这样可选协议如果撞上 PORT/ARGO_PORT/Argo 内部端口，也能被查出来 ──
     used_ports = set()
+    used_ports.add(f"tcp:{inbound_port}")
+    used_ports.add(f"tcp:{argo_port}")
+    if not disable_argo:
+        used_ports.add(f"tcp:{V_VMESS_PORT}")
+        used_ports.add(f"tcp:{V_VLESS_PORT}")
+        used_ports.add(f"tcp:{V_TROJAN_PORT}")
 
     def port_ok(p: int, proto: str) -> bool:
         if not p or p < 1 or p > 65535:
@@ -698,18 +728,24 @@ def main():
             except Exception as e:
                 log.error("Reality 密钥生成失败: %s", e)
 
-        inbounds.append({
-            "type": "vless", "tag": "reality-in", "listen": "::", "listen_port": reality_port,
-            "users": [{"uuid": node_uuid, "flow": "xtls-rprx-vision"}],
-            "tls": {
-                "enabled": True, "server_name": reality_domain,
-                "reality": {
-                    "enabled": True,
-                    "handshake": {"server": reality_domain, "server_port": 443},
-                    "private_key": reality_priv_key, "short_id": [""],
+        # 密钥没拿到就不要塞一个 private_key 为空的 inbound 指望 sing-box check 兜底，
+        # 直接跳过这个协议，效果上和其它协议"依赖资源不可用则整体跳过"保持一致
+        if not reality_priv_key or not reality_pub_key:
+            log.warning("因密钥不可用，VLESS Reality 已跳过")
+            reality_active = False
+        else:
+            inbounds.append({
+                "type": "vless", "tag": "reality-in", "listen": "::", "listen_port": reality_port,
+                "users": [{"uuid": node_uuid, "flow": "xtls-rprx-vision"}],
+                "tls": {
+                    "enabled": True, "server_name": reality_domain,
+                    "reality": {
+                        "enabled": True,
+                        "handshake": {"server": reality_domain, "server_port": 443},
+                        "private_key": reality_priv_key, "short_id": [""],
+                    },
                 },
-            },
-        })
+            })
 
     # Shadowsocks 2022（可选，TCP）
     if ss_active:
