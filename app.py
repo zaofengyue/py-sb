@@ -280,13 +280,17 @@ def start_argo_tunnel(cf_bin: str, argo_port: int, argo_domain: str, argo_auth: 
     pattern = re.compile(r"https://([a-z0-9-]+\.trycloudflare\.com)")
 
     def _read_stderr():
+        # 注意：拿到域名后不能 break/close 管道。cloudflared 进程会持续往 stderr
+        # 写心跳日志，一旦管道读端被关闭，它下次写入会收到 SIGPIPE 而被杀死，
+        # 隧道随之断开（域名已经打印出来，看起来"成功"了，实际已经不通）。
+        # 这里让循环一直跑到进程自己退出为止，持续把日志读掉（不处理也要读），
+        # 保持管道通畅，等价于 Node 版 `cf.stderr.on('data', ...)` 一直挂着监听的效果。
         for line in iter(proc.stderr.readline, ""):
             m = pattern.search(line)
             if m and not result["host"]:
                 result["host"] = m.group(1)
                 log.info("临时隧道域名: %s", result["host"])
                 done.set()
-                break
         proc.stderr.close()
 
     threading.Thread(target=_read_stderr, daemon=True).start()
