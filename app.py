@@ -1,4 +1,4 @@
-"""app.py — node-sb 的 Python 翻译版，基于 sing-box 内核，仅支持 Linux 部署。"""
+"""app.py — py-sb单文件部署。"""
 
 # ========== 预留配置，留空则自动识别 ==========
 CONF_UUID           = ""
