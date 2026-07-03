@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letters Across the Ocean</title>
+
+<style>
+:root{
+    --sand:#f8f4ee;
+    --paper:#fffdf9;
+    --ocean:#6c9db5;
+    --deep:#466b82;
+    --text:#3d3d3d;
+    --muted:#8a8a8a;
+    --line:#e8e0d4;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family: Georgia, serif;
+    background: var(--sand);
+    color: var(--text);
+    line-height: 1.9;
+}
+
+.hero{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:40px;
+    background:
+        linear-gradient(
+            rgba(248,244,238,.82),
+            rgba(248,244,238,.92)
+        ),
+        url("https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=1800&q=80");
+    background-size:cover;
+    background-position:center;
+}
+
+.hero-content{
+    max-width:800px;
+}
+
+.hero small{
+    letter-spacing:4px;
+    text-transform:uppercase;
+    color:var(--ocean);
+}
+
+.hero h1{
+    font-size:clamp(3rem,8vw,6rem);
+    font-weight:400;
+    margin:20px 0;
+}
+
+.hero p{
+    color:#555;
+    font-size:1.1rem;
+    max-width:650px;
+    margin:auto;
+}
+
+.wave-divider{
+    height:100px;
+    background:
+    radial-gradient(circle at 20px 20px, transparent 20px, #f8f4ee 21px);
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:100px 25px;
+}
+
+.section-title{
+    text-align:center;
+    margin-bottom:80px;
+}
+
+.section-title span{
+    color:var(--ocean);
+    letter-spacing:3px;
+    text-transform:uppercase;
+    font-size:.8rem;
+}
+
+.section-title h2{
+    font-size:3rem;
+    font-weight:400;
+    margin-top:15px;
+}
+
+.letter{
+    background:var(--paper);
+    border:1px solid var(--line);
+    padding:45px;
+    margin-bottom:40px;
+    box-shadow:0 10px 30px rgba(0,0,0,.04);
+    position:relative;
+}
+
+.letter:before{
+    content:"✉";
+    position:absolute;
+    top:20px;
+    right:25px;
+    font-size:1.3rem;
+    color:#d6c7b5;
+}
+
+.letter-header{
+    color:var(--ocean);
+    margin-bottom:20px;
+    font-size:.85rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+
+.letter h3{
+    font-size:2rem;
+    font-weight:400;
+    margin-bottom:20px;
+}
+
+.quote{
+    text-align:center;
+    max-width:800px;
+    margin:100px auto;
+    font-size:2rem;
+    color:var(--deep);
+    font-style:italic;
+}
+
+.quote::before{
+    content:"❝";
+    display:block;
+    font-size:4rem;
+    margin-bottom:15px;
+    opacity:.3;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:30px;
+}
+
+.card{
+    background:white;
+    padding:30px;
+    border:1px solid var(--line);
+}
+
+.card h4{
+    font-size:1.4rem;
+    margin-bottom:15px;
+    font-weight:400;
+}
+
+.card p{
+    color:#666;
+}
+
+.footer{
+    text-align:center;
+    padding:80px 20px;
+    border-top:1px solid var(--line);
+}
+
+.footer h3{
+    font-size:2rem;
+    font-weight:400;
+    margin-bottom:10px;
+}
+
+.footer p{
+    color:var(--muted);
+}
+
+.signature{
+    margin-top:25px;
+    color:var(--deep);
+    font-style:italic;
+}
+
+@media(max-width:768px){
+
+.hero h1{
+    font-size:3.5rem;
+}
+
+.section-title h2{
+    font-size:2.2rem;
+}
+
+.quote{
+    font-size:1.4rem;
+}
+
+.letter{
+    padding:30px;
+}
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <small>Letters Across the Ocean</small>
+
+        <h1>Messages Carried by the Sea</h1>
+
+        <p>
+            A collection of gentle letters, drifting across distant waters.
+            Some are written for strangers. Some are written for ourselves.
+            All are meant to bring comfort to those who find them.
+        </p>
+
+    </div>
+
+</section>
+
+<div class="wave-divider"></div>
+
+<main class="container">
+
+    <div class="section-title">
+        <span>Found Bottles</span>
+        <h2>Letters Washed Ashore</h2>
+    </div>
+
+    <article class="letter">
+
+        <div class="letter-header">
+            Letter #001 · To Whoever Needs This
+        </div>
+
+        <h3>You Are Allowed to Rest</h3>
+
+        <p>
+            If you found this message today, consider it a reminder:
+            not every day must be productive.
+        </p>
+
+        <p>
+            The ocean does not rush its tides,
+            and trees do not apologize for growing slowly.
+            You do not need to earn your worth through constant effort.
+        </p>
+
+        <div class="signature">
+            — From a traveler beyond the horizon
+        </div>
+
+    </article>
+
+    <article class="letter">
+
+        <div class="letter-header">
+            Letter #014 · A Quiet Evening
+        </div>
+
+        <h3>The People Who Stay</h3>
+
+        <p>
+            Some people arrive like waves,
+            touching our lives briefly before returning to sea.
+        </p>
+
+        <p>
+            Others become anchors,
+            remaining even when storms appear.
+            Treasure those who choose to stay.
+        </p>
+
+        <div class="signature">
+            — Written beneath a lighthouse
+        </div>
+
+    </article>
+
+    <article class="letter">
+
+        <div class="letter-header">
+            Letter #027 · Unknown Origin
+        </div>
+
+        <h3>Tomorrow Is Still Unwritten</h3>
+
+        <p>
+            The future can feel like an endless ocean.
+            Vast. Uncertain. Mysterious.
+        </p>
+
+        <p>
+            But every journey begins with a single wave.
+            You do not need to know the entire route
+            to take the next step.
+        </p>
+
+        <div class="signature">
+            — A message sealed with hope
+        </div>
+
+    </article>
+
+    <div class="quote">
+        Somewhere across the ocean,
+        another person is hoping for the same peace you seek.
+    </div>
+
+    <div class="section-title">
+        <span>Collected Notes</span>
+        <h2>Small Comforts</h2>
+    </div>
+
+    <section class="grid">
+
+        <div class="card">
+            <h4>Sunrise</h4>
+            <p>
+                Every morning is proof that endings are not permanent.
+            </p>
+        </div>
+
+        <div class="card">
+            <h4>Rain</h4>
+            <p>
+                Some storms arrive only to make room for clearer skies.
+            </p>
+        </div>
+
+        <div class="card">
+            <h4>Waves</h4>
+            <p>
+                The sea teaches us that returning is just as natural as leaving.
+            </p>
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="footer">
+
+    <h3>Letters Across the Ocean</h3>
+
+    <p>
+        A place for gentle thoughts, drifting endlessly across the sea.
+    </p>
+
+</footer>
+
+</body>
+</html>
