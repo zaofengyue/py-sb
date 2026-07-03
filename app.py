@@ -42,11 +42,12 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelna
 log = logging.getLogger("node-sb")
 
 HOME            = Path(os.environ.get("HOME") or tempfile.gettempdir())
-UUID_FILE       = HOME / "uuid.txt"
-CONFIG_FILE     = HOME / "sb-config.json"
-SB_DIR          = HOME / "sing-box"
+DATA_DIR        = HOME / "py-sb"
+UUID_FILE       = DATA_DIR / "uuid.txt"
+CONFIG_FILE     = DATA_DIR / "sb-config.json"
+SB_DIR          = DATA_DIR / "sing-box"
 SB_BIN_PATH     = SB_DIR / "sing-box"
-CLOUDFLARED_BIN = HOME / "cloudflared"
+CLOUDFLARED_BIN = DATA_DIR / "cloudflared"
 
 # Argo 三协议 WS 路径
 WS_PATH_VMESS  = "/fengyue-vm"
@@ -262,7 +263,7 @@ def download_cloudflared() -> str:
 def start_argo_tunnel(cf_bin: str, argo_port: int, argo_domain: str, argo_auth: str) -> str:
     if argo_domain and argo_auth:
         log.info("启动固定 Argo 隧道...")
-        cf_log_file = HOME / "cloudflared.log"
+        DATA_DIR / "cloudflared.log"
         log_fd = open(cf_log_file, "a")
         proc = subprocess.Popen(
             [cf_bin, "tunnel", "--edge-ip-version", "auto", "--no-autoupdate", "run", "--token", argo_auth],
@@ -513,6 +514,7 @@ def run_public_server(port: int, sub_path: str, index_html: str, sub_holder: dic
 # 主流程
 # ──────────────────────────────────────────────
 def main():
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
     disable_argo = (CONF_DISABLE_ARGO or os.environ.get("DISABLE_ARGO", "")) == "true"
 
     # UUID
@@ -649,7 +651,7 @@ def main():
     cert_ready = False
     if hy2_active or tuic_active or anytls_active:
         try:
-            key_path, cert_path = generate_self_signed_cert(HOME / "certs")
+            key_path, cert_path = generate_self_signed_cert(DATA_DIR / "certs")
             cert_ready = True
         except Exception as e:
             log.error("证书生成失败，Hysteria2/TUIC/AnyTLS 将被跳过: %s", e)
@@ -688,7 +690,7 @@ def main():
     reality_pub_key = ""
     if reality_active:
         log.info("启用 VLESS Reality，端口 %s", reality_port)
-        reality_key_file = HOME / "reality-keys.json"
+        reality_key_file = DATA_DIR / "reality-keys.json"
         reality_priv_key = ""
 
         if reality_key_file.exists():
@@ -917,7 +919,7 @@ def main():
 
     sub_b64 = base64.b64encode("\n".join(links).encode()).decode()
     sub_holder["content"] = sub_b64
-    sub_file = Path.cwd() / "sub.txt"
+    sub_file = DATA_DIR / "sub.txt"
     sub_file.write_text(sub_b64)
 
     print("================= 订阅内容 =================")
